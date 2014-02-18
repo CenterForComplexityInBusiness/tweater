@@ -8,7 +8,7 @@ if VERSION_5_5_OR_LATER:
   charcol = "utf8mb4_unicode_ci"
 else:
   # for MySQL 5.1 and earlier
-  charset = "utf8" 
+  charset = "utf8"
   charcol = "utf8_general_ci"
 
 dbname = raw_input("Name of MySQL database to be created: ")
@@ -24,8 +24,8 @@ tweater.mysql.user=%(dbuser)s
 tweater.mysql.pass=%(dbpass)s
 tweater.mysql.host=localhost
 tweater.mysql.queryGroups=
-oauth.consumerKey=RTojEz16nwhI3IrBrZpNQ
-oauth.consumerSecret=lNfVdu2cFKrlEbaw1OiM2Y3TgVKLGBI3AuEEblZilek
+oauth.consumerKey=
+oauth.consumerSecret=
 """ % locals())
 f.close()
 
@@ -52,9 +52,9 @@ CREATE TABLE query_group (
   PRIMARY KEY(query_group_no),
   INDEX(query_start_time),
   INDEX(query_end_time),
-  INDEX(query_start_time, query_end_time)) 
+  INDEX(query_start_time, query_end_time))
   ENGINE innodb;
-  
+
 # Sets of track keyword (separated by spaces), where all words must exist in a tweet
 CREATE TABLE query_track (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -62,9 +62,9 @@ CREATE TABLE query_track (
   query_group_no INTEGER NOT NULL,
   query_track_string VARCHAR(140) NOT NULL,
   PRIMARY KEY(query_track_no),
-  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE) 
+  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE)
   ENGINE innodb;
-  
+
 # Sets of track phrases, where the exact phrase (case insensitive) must exist in a tweet
 CREATE TABLE query_phrase (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -72,7 +72,7 @@ CREATE TABLE query_phrase (
   query_group_no INTEGER NOT NULL,
   query_phrase_string VARCHAR(140) NOT NULL,
   PRIMARY KEY(query_phrase_no),
-  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE) 
+  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE)
   ENGINE innodb;
 
 # List of user ids to follow
@@ -82,7 +82,7 @@ CREATE TABLE query_follow (
   query_group_no INTEGER NOT NULL,
   query_user_id INTEGER NOT NULL,
   PRIMARY KEY(query_follow_no),
-  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE) 
+  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE)
   ENGINE innodb;
 
 # A Twitter user's information, collected at a specific time
@@ -107,7 +107,7 @@ CREATE TABLE user (
 CREATE TABLE status (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
   status_id BIGINT NOT NULL,
-  user_id INTEGER NOT NULL,
+  user_id BIGINT NOT NULL,
   status_date BIGINT NOT NULL,
   status_text VARCHAR(140) NOT NULL,
   status_sentiment DOUBLE,
@@ -121,7 +121,7 @@ CREATE TABLE status (
   INDEX(status_retweet_of),
   INDEX(status_date))
   ENGINE innodb;
-  
+
 # links between statuses and the track keywords that they match
 CREATE TABLE track_match (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -129,7 +129,7 @@ CREATE TABLE track_match (
   status_id BIGINT NOT NULL,
   PRIMARY KEY(query_track_no, status_id),
   FOREIGN KEY(query_track_no) REFERENCES query_track(query_track_no) ON DELETE CASCADE,
-  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE) 
+  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE)
   ENGINE innodb;
 
 # links between statuses and the track phrases that they match
@@ -139,7 +139,7 @@ CREATE TABLE phrase_match (
   status_id BIGINT NOT NULL,
   PRIMARY KEY(query_phrase_no, status_id),
   FOREIGN KEY(query_phrase_no) REFERENCES query_phrase(query_phrase_no) ON DELETE CASCADE,
-  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE) 
+  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE)
   ENGINE innodb;
 
 # links between statuses and the follow users they match
@@ -149,7 +149,7 @@ CREATE TABLE follow_match (
   status_id BIGINT NOT NULL,
   PRIMARY KEY(query_follow_no, status_id),
   FOREIGN KEY(query_follow_no) REFERENCES query_follow(query_follow_no) ON DELETE CASCADE,
-  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE) 
+  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE)
   ENGINE innodb;
 
 # hashtag entities
@@ -160,7 +160,7 @@ CREATE TABLE hashtag (
   PRIMARY KEY(hashtag_no),
   UNIQUE(hashtag_text))
   ENGINE innodb;
-  
+
 # links between statuses and the hashtags they contain
 CREATE TABLE hashtag_match (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -170,7 +170,7 @@ CREATE TABLE hashtag_match (
   hashtag_endidx SMALLINT NOT NULL,
   PRIMARY KEY(hashtag_no, status_id),
   FOREIGN KEY(hashtag_no) REFERENCES hashtag(hashtag_no) ON DELETE CASCADE,
-  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE) 
+  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE)
   ENGINE innodb;
 
 # expanded link entities
@@ -192,7 +192,7 @@ CREATE TABLE link (
   FOREIGN KEY(expanded_link_no) REFERENCES expanded_link(expanded_link_no) ON DELETE CASCADE,
   UNIQUE(link_url))
   ENGINE innodb;
-  
+
 # links between statuses and the links they contain
 CREATE TABLE link_match (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -204,7 +204,7 @@ CREATE TABLE link_match (
   FOREIGN KEY(link_no) REFERENCES link(link_no) ON DELETE CASCADE,
   FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE)
   ENGINE innodb;
-  
+
 # mentions pulled out of statuses
 CREATE TABLE mention (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -216,9 +216,9 @@ CREATE TABLE mention (
   PRIMARY KEY(status_id, mention_startidx),
   FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE,
   INDEX(mention_by, mention_of),
-  INDEX(mention_of, mention_by)) 
+  INDEX(mention_of, mention_by))
   ENGINE innodb;
-  
+
 """ % locals())
 f.close();
 print(

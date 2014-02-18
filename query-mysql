@@ -5,9 +5,10 @@ from time import mktime
 import codecs
 import sys
 
-if len(sys.argv) < 2:
-	print "USAGE: query-mysql <query-file.csv> > query.sql"
-	
+if len(sys.argv) < 3:
+	print "USAGE: query-mysql <query-file(s).csv> <output file>"
+	exit()
+
 fout = codecs.open(sys.argv[-1], mode='w', encoding="utf-8")
 
 fout.write(u'SET NAMES utf8;\n');
@@ -34,12 +35,12 @@ for file in sys.argv[1:-1]:
 				else:
 					sys.stderr.write("Unknown query type %s on line %i; skipping.\n" % (type, lno))
 					doInsert = False
-					
+
 				if do_insert:
 					fout.write(u"INSERT INTO query_group(query_start_time,query_end_time) VALUES (%i,%i);\n" % (start, end))
 					fout.write(ins_query + u'\n')
 			else:
 				sys.stderr.write("Malformed line %i has %i fields; skipping.\n" % (lno, len(fields)))
 		lno += 1
-	
+
 	fin.close()

@@ -6,7 +6,7 @@
 # tweets in RAM while they are waiting to be written to disk. If you are running only low-volume
 # queries and you have turned off sentiment analysis, you can safely decrease this some, probably 
 # as far as 256m.
-MEMORY="1024m"
+MEMORY="2048m"
 
 # This specifies the name of jar file that TwEater resides in. You may have to change this if you're
 # compiling the code yourself.
