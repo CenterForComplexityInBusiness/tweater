@@ -3,11 +3,9 @@ package edu.umd.cs.dmonner.tweater;
 import java.awt.geom.Rectangle2D;
 
 /**
- * A <code>QueryItem</code> that matches on set of keywords, which need not
- * necessarily be in order or adjacent, specified as a single
- * whitespace-separated <code>String</code>.
+ * A <code>QueryItem</code> that matches tweets on a latitude/longitude bounding box.
  * 
- * @author dmonner
+ * @author rmachedo
  */
 public class QueryLocation extends QueryItem {
 	private static final long serialVersionUID = 1L;
