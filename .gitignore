@@ -15,3 +15,13 @@
 /*.log.*
 /*.csv
 /*.sql
+
+# more execution things
+*.properties
+
+# except ones that are included as examples
+!tweater.properties
+!build.properties
+!common.properties
+!logging.properties
+!twitter4j.properties
