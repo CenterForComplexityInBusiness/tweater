@@ -6,7 +6,7 @@
 # start_time, end_time, type, query
 #
 # TIPS:
-# Three types of query: exact phrase, keywords anywhere, or user tracking.
+# Four types of query: exact phrase, keywords anywhere, user tracking, or location.
 # See file QUERY.README for instructions on good query-building.
 # Total phrase and keyword length limit (per line) is 60 characters.
 # You can have a total of 400 combined phrase and keyword lines active at a time.
@@ -27,5 +27,8 @@
 # 6/26/11 8pm, 6/27/11 8am, user, 12611642
 #   Matches: all tweets by @thinkgeek (user 12611642) including replies to other users and retweets
 #     of other users
+#
+# 1pm, 5pm, location, -122.75;36.8;-121.75;37.8
+#   Matches: all tweets with geotags or place tags inside the San Francisco area
 #
 # OKAY GET TO IT!

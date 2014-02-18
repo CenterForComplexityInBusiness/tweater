@@ -11,6 +11,9 @@ A phrase query is a case-insensitive exact string match that may include whitesp
 Follow Queries:
 For a follow query you must specify the user ID of a single Twitter user. A follow query for user ID 123 will return all tweets that user 123 publishes after the query was launched, which includes replies from user 123 to others and retweets that 123 makes of other users' tweets. It also contains any direct "official" replies to user 123 or any "official" retweets of user 123. The query will NOT return "manual" mentions of, replies to, or retweets of user 123; this is a limitation of the Twitter Streaming API (see https://dev.twitter.com/docs/streaming-apis/parameters#follow for more information). If you want to find these missing tweets, you should issue a track query on the "@username". The only downside to this strategy is that you are limited to 400 such track queries instead of the 5000-limit for follow queries. If you have the username and need the ID (i.e. a number), try this site: http://idfromuser.com/
 
+Location Queries:
+For a location query you must specify a bounding-box of two longitude, latitude pairs. This will return all tweets with geo-tags or place tags within the given bounding-box. (see https://dev.twitter.com/docs/streaming-apis/parameters#locations for more information).
+
 QUERY CONSTRUCTION
 
 Twitter queries are case-INsensitive and are specified as sets of whitespace-separated keywords, ALL of much must be present in a tweet for it to be sent to you. Twitter does not support phrases of whitespace-separated keywords, but TwEater adds this functionality by submitting a normal query and discarding any tweets sent back that do not match the phrase in full. Thus, one must make sure that phrase queries, when construed as keywords-anywhere queries by Twitter, are not too broad, and would in fact return tweets containing the phrase in question, as detailed below.
