@@ -42,7 +42,8 @@ REM echo $JARPATH
 REM Check whether the first argument is "start" or something else
 if "%COMMAND%" == "start" (
 	REM Run the program in a new cmd window and Xmx to start a new instance
-	start "TwEater %DATE:~-4%-%DATE:~4,2%-%DATE:~7,2%" java -server -Xmx%MEMORY% -cp "%CP%" ^
+	start "TwEater %DATE:~-4%-%DATE:~4,2%-%DATE:~7,2%" ^
+        java -server -Xmx%MEMORY% -cp "%CP%" ^
 			-XX:-UseGCOverheadLimit ^
 			-Djava.rmi.server.codebase="file:/%JARPATH:\=/%" ^
 			-Djava.util.logging.config.file=logging.properties ^
@@ -50,7 +51,7 @@ if "%COMMAND%" == "start" (
 			edu.umd.cs.dmonner.tweater.TwEater %*
 ) else (
 	REM Run the program in single-interaction mode
-	java -cp "%CP%" ^
+        java -cp "%CP%" ^
 			-Djava.rmi.server.codebase="file:/%JARPATH:\=/%" ^
 			-Djava.util.logging.config.file=logging.properties ^
 		-Dfile.encoding=UTF-8 ^
