@@ -394,6 +394,8 @@ public class MySQLStatusEater extends BaseStatusEater
 				table = "phrase_match(query_phrase_no, status_id)";
 			else if(match.type == Type.FOLLOW)
 				table = "follow_match(query_follow_no, status_id)";
+			else if(match.type == Type.LOCATION)
+				table = "location_match(query_location_no, status_id)";
 			else
 				log.warning("Unhandled match type: " + match.type);
 

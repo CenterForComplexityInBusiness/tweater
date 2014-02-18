@@ -30,7 +30,11 @@ public abstract class QueryItem implements Comparable<QueryItem>, Serializable
 		/**
 		 * Matches on the user ID of the originator of the <code>Status</code>
 		 */
-		FOLLOW
+		FOLLOW,
+		/**
+		 * Matches on the geo-tagged location of the <code>Status</code>
+		 */
+		LOCATION
 	}
 
 	private static final long serialVersionUID = 1L;;

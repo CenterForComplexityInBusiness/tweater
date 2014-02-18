@@ -1,5 +1,6 @@
 package edu.umd.cs.dmonner.tweater.mysql;
 
+import java.awt.geom.Rectangle2D;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 import edu.umd.cs.dmonner.tweater.QueryBuilder;
 import edu.umd.cs.dmonner.tweater.QueryFollow;
 import edu.umd.cs.dmonner.tweater.QueryItemTime;
+import edu.umd.cs.dmonner.tweater.QueryLocation;
 import edu.umd.cs.dmonner.tweater.QueryPhrase;
 import edu.umd.cs.dmonner.tweater.QueryTrack;
 import edu.umd.cs.dmonner.tweater.util.NumberSet;
@@ -79,7 +81,7 @@ public class MySQLQueryBuilder extends QueryBuilder
 		log.fine("Beginning MySQLQueryBuilder update...");
 		final List<QueryItemTime> all = new LinkedList<QueryItemTime>();
 		boolean querySucceeded = false;
-
+		
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -136,12 +138,30 @@ public class MySQLQueryBuilder extends QueryBuilder
 						rs.getLong("query_start_time"), rs.getLong("query_end_time")));
 			}
 
+			// get the location queries
+			rs = stmt
+					.executeQuery("SELECT query_group_no, query_location_no, " +
+							"query_location_long1, query_location_lat1, query_location_long2, query_location_lat2, " +
+							"query_start_time, query_end_time " +
+							"FROM query_group INNER JOIN query_location USING (query_group_no)" + where + ";");
+
+			while(rs.next())
+			{
+				double x1 = rs.getDouble("query_location_long1"), 
+						y1 = rs.getDouble("query_location_lat1"), 
+						x2 = rs.getDouble("query_location_long2"), 
+						y2 = rs.getDouble("query_location_lat2");
+				Rectangle2D.Double rect = new Rectangle2D.Double(x1, y1, x2 - x1, y2 - y1);
+				all.add(new QueryItemTime(new QueryLocation(rs.getInt("query_group_no"), rs
+						.getInt("query_location_no"), rect),
+						rs.getLong("query_start_time"), rs.getLong("query_end_time")));
+			}
+			
 			querySucceeded = true;
 		}
 		catch(final SQLException ex)
 		{
-			log.severe( //
-			"SQLState: " + ex.getSQLState() + "\n" + //
+			log.severe("SQLState: " + ex.getSQLState() + "\n" + //
 					"VendorError: " + ex.getErrorCode() + "\n" + //
 					Util.traceMessage(ex));
 		}

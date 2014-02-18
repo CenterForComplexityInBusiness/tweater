@@ -1,5 +1,6 @@
 package edu.umd.cs.dmonner.tweater.csv;
 
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,6 +14,7 @@ import edu.umd.cs.dmonner.tweater.QueryBuilder;
 import edu.umd.cs.dmonner.tweater.QueryFollow;
 import edu.umd.cs.dmonner.tweater.QueryItem;
 import edu.umd.cs.dmonner.tweater.QueryItemTime;
+import edu.umd.cs.dmonner.tweater.QueryLocation;
 import edu.umd.cs.dmonner.tweater.QueryPhrase;
 import edu.umd.cs.dmonner.tweater.QueryTrack;
 import edu.umd.cs.dmonner.tweater.util.Properties;
@@ -106,6 +108,29 @@ public class CSVQueryBuilder extends QueryBuilder
 					catch(final NumberFormatException ex)
 					{
 						log.warning("Malformed input! Expected a user id number (not \"" + item
+								+ "\") on line number " + lineno);
+					}
+				}
+				else if(type.equalsIgnoreCase("location"))
+				{
+					try
+					{
+						String[] coords = item.split(";");
+						double x1 = Float.parseFloat(coords[0]), 
+								y1 = Float.parseFloat(coords[1]), 
+								x2 = Float.parseFloat(coords[2]), 
+								y2 = Float.parseFloat(coords[3]);
+						Rectangle2D rect = new Rectangle2D.Double(x1, y1, x2-x1, y2-y1);
+						qitem = new QueryLocation(lineno, lineno, rect);
+					}
+					catch(final NumberFormatException ex)
+					{
+						log.warning("Malformed input! Expected four semicolon-delimeted coordinates (not \"" + item
+								+ "\") on line number " + lineno);
+					}
+					catch(final ArrayIndexOutOfBoundsException ex)
+					{
+						log.warning("Malformed input! Expected four semicolon-delimeted coordinates (not \"" + item
 								+ "\") on line number " + lineno);
 					}
 				}
