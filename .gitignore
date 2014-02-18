@@ -1,3 +1,17 @@
-/query.csv
-/results.csv
-/tweater*.log
+# -----------------
+# crud that doesn't belong here
+# -----------------
+
+# build things
+/build
+/bin
+
+# execution & test things
+/test
+/in
+/out
+/log
+/*.log
+/*.log.*
+/*.csv
+/*.sql
