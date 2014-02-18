@@ -234,10 +234,12 @@ CREATE TABLE mention (
   status_id BIGINT NOT NULL,
   mention_startidx SMALLINT NOT NULL,
   mention_endidx SMALLINT NOT NULL,
-  mention_by INTEGER NOT NULL,
-  mention_of INTEGER NOT NULL,
+  mention_by BIGINT NOT NULL,
+  mention_of BIGINT NOT NULL,
   PRIMARY KEY(status_id, mention_startidx),
   FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE,
+  FOREIGN KEY(mention_by) REFERENCES user(user_id) ON DELETE CASCADE,
+  FOREIGN KEY(mention_of) REFERENCES user(user_id) ON DELETE CASCADE,
   INDEX(mention_by, mention_of),
   INDEX(mention_of, mention_by))
   ENGINE innodb;
