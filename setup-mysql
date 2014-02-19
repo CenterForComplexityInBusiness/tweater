@@ -15,7 +15,7 @@ dbname = raw_input("Name of MySQL database to be created: ")
 dbuser = raw_input("Name of MySQL user to be created: ")
 dbpass = raw_input("Password for MySQL user %s: " % dbuser)
 
-f = open("%(dbname)s.properties" % locals(), 'w')
+f = open("tweater_db_%(dbname)s.properties" % locals(), 'w')
 f.write(
 """
 tweater.dbType=mysql
@@ -75,7 +75,7 @@ CREATE TABLE query_phrase (
   FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE)
   ENGINE innodb;
 
-# Sets of locations to track, where the tweet's geotrag must be in the given long/lat bounding box
+# Sets of locations to track, where the tweet's geotag must be in the given long/lat bounding box
 CREATE TABLE query_location (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
   query_location_no INTEGER NOT NULL AUTO_INCREMENT,
@@ -237,9 +237,8 @@ CREATE TABLE mention (
   mention_by BIGINT NOT NULL,
   mention_of BIGINT NOT NULL,
   PRIMARY KEY(status_id, mention_startidx),
-  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE,
-  FOREIGN KEY(mention_by) REFERENCES user(user_id) ON DELETE CASCADE,
-  FOREIGN KEY(mention_of) REFERENCES user(user_id) ON DELETE CASCADE,
+  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE;
+  FOREIGN KEY(mention_by) REFERENCES user(user_id) ON DELETE CASCADE;
   INDEX(mention_by, mention_of),
   INDEX(mention_of, mention_by))
   ENGINE innodb;

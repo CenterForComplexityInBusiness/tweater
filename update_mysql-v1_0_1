@@ -1,0 +1,92 @@
+#!/usr/bin/python
+
+dbname = raw_input("Name of MySQL TwEater database to be updated v1.0.0 -> v1.0.1: ")
+sfkname = raw_input("Name of status table's foreign key constraint into user id (default is \"status_ibfk_1\"): ")
+
+if sfkname == "":
+    sfkname = "status_ibfk_1"
+    
+add_sentiment = None
+while add_sentiment is None:
+    sent = raw_input("Is sentiment column already present? (y/n): ")
+    if sent == "y" or sent == "Y":
+        add_sentiment = ""
+    elif sent == "n" or sent == "N":
+        add_sentiment = "ALTER TABLE status ADD COLUMN status_sentiment DOUBLE;"
+    
+
+fn = "update_%(dbname)s-v1_0_1.sql" % locals()
+f = open(fn, 'w')
+f.write(
+"""
+# Use database
+USE %(dbname)s;
+
+# start upgrade...
+START TRANSACTION;
+
+# Upgrade to user ID type (bigint instead of int)
+ALTER TABLE status
+  DROP FOREIGN KEY %(sfkname)s;
+
+ALTER TABLE status
+  MODIFY COLUMN user_id BIGINT NOT NULL;
+  
+ALTER TABLE user 
+  MODIFY COLUMN user_id BIGINT NOT NULL;
+
+ALTER TABLE status
+  MODIFY COLUMN user_id BIGINT NOT NULL,
+  ADD FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE;
+
+ALTER TABLE mention 
+  MODIFY COLUMN mention_by BIGINT NOT NULL,
+  MODIFY COLUMN mention_of BIGINT NOT NULL;
+  ADD FOREIGN KEY(user_id) REFERENCES user(user_id) ON DELETE CASCADE;
+  
+# user modifications: longer name and lang
+ALTER TABLE user 
+  MODIFY COLUMN user_name VARCHAR(100) NOT NULL,
+  MODIFY COLUMN user_lang VARCHAR(30) NOT NULL;
+  
+# user modifications: longer name and lang
+ALTER TABLE user 
+  MODIFY COLUMN user_name VARCHAR(100) NOT NULL,
+  MODIFY COLUMN user_lang VARCHAR(30) NOT NULL;
+  
+# status modifications: add sentiment column if it was not already there
+%(add_sentiment)s
+
+# Sets of locations to track, where the tweet geotag must be in the given long/lat bounding box
+CREATE TABLE query_location (
+  row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  query_location_no INTEGER NOT NULL AUTO_INCREMENT,
+  query_group_no INTEGER NOT NULL,
+  query_location_long1 DOUBLE NOT NULL,
+  query_location_lat1 DOUBLE NOT NULL,
+  query_location_long2 DOUBLE NOT NULL,
+  query_location_lat2 DOUBLE NOT NULL,
+  PRIMARY KEY(query_location_no),
+  FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE) 
+  ENGINE innodb;
+
+# links between statuses and the track locations that they match
+CREATE TABLE location_match (
+  row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  query_location_no INTEGER NOT NULL,
+  status_id BIGINT NOT NULL,
+  PRIMARY KEY(query_location_no, status_id),
+  FOREIGN KEY(query_location_no) REFERENCES query_location(query_location_no) ON DELETE CASCADE,
+  FOREIGN KEY(status_id) REFERENCES status(status_id) ON DELETE CASCADE) 
+  ENGINE innodb;
+
+# done
+COMMIT;
+
+""" % locals())
+f.close();
+print(
+"""
+SQL commands saved to %(fn)s. Now run:
+$ mysql -u root -p < %(fn)s
+""" % locals())
