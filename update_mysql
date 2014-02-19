@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
-dbname = raw_input("Name of MySQL TwEater database to be updated v1.0.0 -> v1.0.1: ")
+print("This script will produce a .sql query to update an existing TwEater \n\
+    installation's database to the version used in v1.0.1.\n")
+
+dbname = raw_input("Name of MySQL TwEater database to be updated: ")
 sfkname = raw_input("Name of status table's foreign key constraint into user id (default is \"status_ibfk_1\"): ")
 
 if sfkname == "":
@@ -13,9 +16,8 @@ while add_sentiment is None:
         add_sentiment = ""
     elif sent == "n" or sent == "N":
         add_sentiment = "ALTER TABLE status ADD COLUMN status_sentiment DOUBLE;"
-    
 
-fn = "update_%(dbname)s-v1_0_1.sql" % locals()
+fn = "update_%(dbname)s.sql" % locals()
 f = open(fn, 'w')
 f.write(
 """
