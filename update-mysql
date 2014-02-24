@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 print("This script will produce a .sql query to update an existing TwEater \n\
-    installation's database to the version used in v1.0.1.\n")
+    installation's database from the version used in v1.0.0.\n")
 
 dbname = raw_input("Name of MySQL TwEater database to be updated: ")
 sfkname = raw_input("Name of status table's foreign key constraint into user id (default is \"status_ibfk_1\"): ")
