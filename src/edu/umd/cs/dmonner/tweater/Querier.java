@@ -1,6 +1,5 @@
 package edu.umd.cs.dmonner.tweater;
 
-import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -9,6 +8,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import twitter4j.FilterQuery;
+import twitter4j.GeoLocation;
 import twitter4j.TwitterStream;
 import edu.umd.cs.dmonner.tweater.util.Util;
 
@@ -248,7 +248,7 @@ public class Querier extends Thread
 	{
 		final List<String> tracks = new LinkedList<String>();
 		final List<Long> follows = new LinkedList<Long>();
-		final List<Rectangle2D> locations = new LinkedList<Rectangle2D>();
+		final List<GeoLocation> locations = new LinkedList<GeoLocation>();
 
 		for(final QueryItem item : items) {
 			if(item instanceof QueryTrack) {
@@ -258,7 +258,8 @@ public class Querier extends Thread
 			} else if(item instanceof QueryFollow) {
 				follows.add(((QueryFollow) item).userid);
 			} else if(item instanceof QueryLocation) {
-				locations.add(((QueryLocation) item).location);
+				locations.add(((QueryLocation) item).pointSW);
+				locations.add(((QueryLocation) item).pointNE);
 			}
 		}
 
@@ -269,14 +270,12 @@ public class Querier extends Thread
 			follow[idx++] = id;
 		}
 
-		location = new double[locations.size() * 2][2];
+		location = new double[locations.size()][2];
 		idx = 0;
-		for(Rectangle2D rect: locations) {
-			location[idx][0] = rect.getMinX();
-			location[idx][1] = rect.getMinY();
-			location[idx + 1][0] = rect.getMaxX();
-			location[idx + 1][1] = rect.getMaxY();
-			idx += 2;
+		for(GeoLocation pt: locations) {
+			location[idx][0] = pt.getLongitude();
+			location[idx][1] = pt.getLatitude();
+			idx += 1;
 		}
 		
 		disconnect();

@@ -33,7 +33,7 @@ for file in sys.argv[1:-1]:
 				elif type == "user":
 					ins_query = u"INSERT INTO query_follow(query_group_no,query_user_id) VALUES (LAST_INSERT_ID(),%s);" % query
 				elif type == "location":
-					ins_query = u"INSERT INTO query_location(query_group_no,query_location_long1,query_location_lat1,query_location_long2,query_location_lat2) VALUES (LAST_INSERT_ID(),%s);" % ",".join(query.split(";"))
+					ins_query = u"INSERT INTO query_location(query_group_no,query_location_longSW,query_location_latSW,query_location_longNE,query_location_latNE) VALUES (LAST_INSERT_ID(),%s);" % ",".join(query.split(";"))
 				else:
 					sys.stderr.write("Unknown query type %s on line %i; skipping.\n" % (type, lno))
 					doInsert = False

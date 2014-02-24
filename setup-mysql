@@ -80,10 +80,10 @@ CREATE TABLE query_location (
   row_added_at TIMESTAMP NOT NULL DEFAULT NOW(),
   query_location_no INTEGER NOT NULL AUTO_INCREMENT,
   query_group_no INTEGER NOT NULL,
-  query_location_long1 DOUBLE NOT NULL,
-  query_location_lat1 DOUBLE NOT NULL,
-  query_location_long2 DOUBLE NOT NULL,
-  query_location_lat2 DOUBLE NOT NULL,
+  query_location_longSW DOUBLE NOT NULL,
+  query_location_latSW DOUBLE NOT NULL,
+  query_location_longNE DOUBLE NOT NULL,
+  query_location_latNE DOUBLE NOT NULL,
   PRIMARY KEY(query_location_no),
   FOREIGN KEY(query_group_no) REFERENCES query_group(query_group_no) ON DELETE CASCADE) 
   ENGINE innodb;

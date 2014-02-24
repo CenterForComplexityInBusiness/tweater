@@ -1,6 +1,6 @@
 package edu.umd.cs.dmonner.tweater;
 
-import java.awt.geom.Rectangle2D;
+import twitter4j.GeoLocation;
 
 /**
  * A <code>QueryItem</code> that matches tweets on a latitude/longitude bounding box.
@@ -13,19 +13,45 @@ public class QueryLocation extends QueryItem {
 	/**
 	 * Coordinates of the bounding-box for the location being searched for
 	 */
-	public final Rectangle2D location;
+	public final GeoLocation pointSW;
+	public final GeoLocation pointNE;
 
 	/**
 	 * Creates a new <code>QueryLocation</code> with the given group number, unique
-	 * ID, and the location bounding-box that we wish to find.
+	 * ID, and the location bounding-box that we wish to find defined by it south-west
+	 * and north-east longitude/latitude points.
 	 * 
 	 * @param group
 	 * @param id
-	 * @param location
+	 * @param pointSW
+	 * @param pointNE
+	 * 
+	 * @throws IllegalArgumentException If the south-west point is not to the south and west 
+	 * of the north-east point, or if the points span outside of <code>[-90, 90]</code> on 
+	 * latitude or <code>[-180, 180]</code> on longitude.
 	 */
-	public QueryLocation(final int group, final int id, Rectangle2D location) {
+	public QueryLocation(final int group, final int id, GeoLocation pointSW, GeoLocation pointNE) {
 		super(Type.LOCATION, group, id);
-		this.location = location;
+		
+		if(pointSW.getLatitude() >= pointNE.getLatitude() || pointSW.getLongitude() >= pointNE.getLongitude())
+		{
+			throw new IllegalArgumentException(String.format("South-west point was not to the south and west of north-east point: (%s, %s) - Twitter will not like this!", pointSW, pointNE));
+		} else if(pointSW.getLatitude() > 90 || pointSW.getLatitude() < -90)
+		{
+			throw new IllegalArgumentException(String.format("South-west point exceeded [-90, 90] latitude bounds: %s - Twitter will not like this!", pointSW));
+		} else if(pointSW.getLongitude() > 180 || pointSW.getLongitude() < -180)
+		{
+			throw new IllegalArgumentException(String.format("South-west point exceeded [-180, 180] longitude bounds: %s - Twitter will not like this!", pointSW));
+		} else if(pointNE.getLatitude() > 90 || pointNE.getLatitude() < -90)
+		{
+			throw new IllegalArgumentException(String.format("North-east point exceeded [-90, 90] latitude bounds: %s - Twitter will not like this!", pointNE));
+		} else if(pointNE.getLongitude() > 180 || pointNE.getLongitude() < -180)
+		{
+			throw new IllegalArgumentException(String.format("North-east point exceeded [-180, 180] longitude bounds: %s", pointNE));
+		}
+		
+		this.pointNE = pointNE;
+		this.pointSW = pointSW;
 	}
 
 	/*
@@ -41,23 +67,24 @@ public class QueryLocation extends QueryItem {
 		if (result != 0)
 			return result;
 
-		Rectangle2D other = ((QueryLocation) that).location;
+		GeoLocation otherSW = ((QueryLocation) that).pointSW;
+		GeoLocation otherNE = ((QueryLocation) that).pointNE;
 		
-		if(location.getMaxX() > other.getMaxX())
+		if(pointSW.getLongitude() > otherSW.getLongitude())
 			return 1;
-		else if(location.getMaxX() < other.getMaxX())
+		else if(pointSW.getLongitude() < otherSW.getLongitude())
 			return -1;
-		if(location.getMinX() > other.getMinX())
+		if(pointNE.getLongitude() > otherNE.getLongitude())
 			return 1;
-		else if(location.getMinX() < other.getMinX())
+		else if(pointNE.getLongitude() < otherNE.getLongitude())
 			return -1;
-		if(location.getMaxY() > other.getMaxY())
+		if(pointSW.getLatitude() > otherSW.getLatitude())
 			return 1;
-		else if(location.getMaxY() < other.getMaxY())
+		else if(pointSW.getLatitude() < otherSW.getLatitude())
 			return -1;
-		if(location.getMinY() > other.getMinY())
+		if(pointNE.getLatitude() > otherNE.getLatitude())
 			return 1;
-		else if(location.getMinY() < other.getMinY())
+		else if(pointNE.getLatitude() < otherNE.getLatitude())
 			return -1;
 		else return 0;
 	}
@@ -75,7 +102,7 @@ public class QueryLocation extends QueryItem {
 		if (!result)
 			return result;
 
-		return this.location.equals(((QueryLocation) other).location);
+		return this.pointSW.equals(((QueryLocation) other).pointSW) && this.pointNE.equals(((QueryLocation) other).pointNE);
 	}
 
 	/*
@@ -85,7 +112,7 @@ public class QueryLocation extends QueryItem {
 	 */
 	@Override
 	public int hashCode() {
-		return super.hashCode() + location.hashCode();
+		return super.hashCode() + this.pointSW.hashCode() + this.pointNE.hashCode();
 	}
 
 	/*
@@ -95,9 +122,12 @@ public class QueryLocation extends QueryItem {
 	 */
 	@Override
 	public boolean matches(final MatchableStatus status) {
-		if(status.status.getGeoLocation() != null) {
-			return location.contains(status.status.getGeoLocation().getLongitude(), 
-					status.status.getGeoLocation().getLatitude());
+		GeoLocation l;
+		if((l = status.status.getGeoLocation()) != null) {
+			return l.getLatitude() >= pointSW.getLatitude() &&
+					l.getLatitude() <= pointNE.getLatitude() &&
+					l.getLongitude() >= pointSW.getLongitude() &&
+					l.getLongitude() < pointNE.getLongitude();
 		} else {
 			return false;
 		}
@@ -110,6 +140,6 @@ public class QueryLocation extends QueryItem {
 	 */
 	@Override
 	public String toString() {
-		return location.toString();
+		return String.format("(%s, %s)", pointSW.toString(), pointNE.toString());
 	}
 }

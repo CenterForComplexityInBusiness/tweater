@@ -1,12 +1,13 @@
 package edu.umd.cs.dmonner.tweater.csv;
 
-import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import twitter4j.GeoLocation;
 
 import com.mdimension.jchronic.Chronic;
 
@@ -116,12 +117,13 @@ public class CSVQueryBuilder extends QueryBuilder
 					try
 					{
 						String[] coords = item.split(";");
-						double x1 = Float.parseFloat(coords[0]), 
-								y1 = Float.parseFloat(coords[1]), 
-								x2 = Float.parseFloat(coords[2]), 
-								y2 = Float.parseFloat(coords[3]);
-						Rectangle2D rect = new Rectangle2D.Double(x1, y1, x2-x1, y2-y1);
-						qitem = new QueryLocation(lineno, lineno, rect);
+						double longSW = Float.parseFloat(coords[0]), 
+								latSW = Float.parseFloat(coords[1]), 
+								longNE = Float.parseFloat(coords[2]), 
+								latNE = Float.parseFloat(coords[3]);
+						GeoLocation pointSW = new GeoLocation(latSW, longSW);
+						GeoLocation pointNE = new GeoLocation(latNE, longNE);
+						qitem = new QueryLocation(lineno, lineno, pointSW, pointNE);
 					}
 					catch(final NumberFormatException ex)
 					{
@@ -132,6 +134,10 @@ public class CSVQueryBuilder extends QueryBuilder
 					{
 						log.warning("Malformed input! Expected four semicolon-delimeted coordinates (not \"" + item
 								+ "\") on line number " + lineno);
+					}
+					catch(final IllegalArgumentException ex)
+					{
+						log.warning("Illegal input! " + ex.getMessage() + " on line number " + lineno);
 					}
 				}
 				else
