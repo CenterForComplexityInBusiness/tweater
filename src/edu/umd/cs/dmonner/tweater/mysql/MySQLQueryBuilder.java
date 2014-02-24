@@ -1,6 +1,5 @@
 package edu.umd.cs.dmonner.tweater.mysql;
 
-import java.awt.geom.Rectangle2D;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +10,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import twitter4j.GeoLocation;
-
 import edu.umd.cs.dmonner.tweater.QueryBuilder;
 import edu.umd.cs.dmonner.tweater.QueryFollow;
 import edu.umd.cs.dmonner.tweater.QueryItemTime;
