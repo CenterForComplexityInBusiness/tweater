@@ -276,7 +276,7 @@ public class Querier extends Thread
 			location[idx][1] = rect.getMinY();
 			location[idx + 1][0] = rect.getMaxX();
 			location[idx + 1][1] = rect.getMaxY();
-			idx++;
+			idx += 2;
 		}
 		
 		disconnect();
