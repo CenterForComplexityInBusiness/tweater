@@ -23,7 +23,7 @@ public class QueryFollow extends QueryItem
 	 * @param id
 	 * @param userid
 	 */
-	public QueryFollow(final int group, final long id, final int userid)
+	public QueryFollow(final int group, final long id, final long userid)
 	{
 		super(Type.FOLLOW, group, id);
 		this.userid = userid;

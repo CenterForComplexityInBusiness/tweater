@@ -134,7 +134,7 @@ public class MySQLQueryBuilder extends QueryBuilder
 			while(rs.next())
 			{
 				all.add(new QueryItemTime(new QueryFollow(rs.getInt("query_group_no"), rs
-						.getInt("query_follow_no"), rs.getInt("query_user_id")),
+						.getInt("query_follow_no"), rs.getLong("query_user_id")),
 						rs.getLong("query_start_time"), rs.getLong("query_end_time")));
 			}
 

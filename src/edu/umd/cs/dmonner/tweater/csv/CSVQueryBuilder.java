@@ -104,7 +104,7 @@ public class CSVQueryBuilder extends QueryBuilder
 				{
 					try
 					{
-						qitem = new QueryFollow(lineno, lineno, Integer.parseInt(item));
+						qitem = new QueryFollow(lineno, lineno, Long.parseLong(item));
 					}
 					catch(final NumberFormatException ex)
 					{
