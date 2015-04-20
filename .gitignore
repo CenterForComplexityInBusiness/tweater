@@ -1,3 +1,27 @@
-/query.csv
-/results.csv
-/tweater*.log
+# -----------------
+# crud that doesn't belong here
+# -----------------
+
+# build things
+/build
+/bin
+
+# execution & test things
+/test
+/in
+/out
+/log
+/*.log
+/*.log.*
+/*.csv
+/*.sql
+
+# more execution things
+*.properties
+
+# except ones that are included as examples
+!tweater.properties
+!build.properties
+!common.properties
+!logging.properties
+!twitter4j.properties

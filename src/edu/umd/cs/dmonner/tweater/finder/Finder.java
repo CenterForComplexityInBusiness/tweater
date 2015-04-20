@@ -139,9 +139,10 @@ public class Finder extends Thread implements FinderControl
 	{
 		final List<Long> ids = new LinkedList<Long>();
 
+		BufferedReader br = null;
 		try
 		{
-			final BufferedReader br = new BufferedReader(new FileReader(filename));
+			br = new BufferedReader(new FileReader(filename));
 
 			String line = null;
 			while((line = br.readLine()) != null)
@@ -170,6 +171,17 @@ public class Finder extends Thread implements FinderControl
 		catch(final IOException ex)
 		{
 			ex.printStackTrace();
+		}
+		finally 
+		{
+			if(br != null) 
+			{
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		return ids;
@@ -363,9 +375,10 @@ public class Finder extends Thread implements FinderControl
 	{
 		final List<String> machines = new LinkedList<String>();
 
+		BufferedReader br = null;
 		try
 		{
-			final BufferedReader br = new BufferedReader(new FileReader(filename));
+			br = new BufferedReader(new FileReader(filename));
 
 			String line = null;
 			while((line = br.readLine()) != null)
@@ -391,6 +404,17 @@ public class Finder extends Thread implements FinderControl
 		catch(final IOException ex)
 		{
 			log.severe(Util.traceMessage(ex));
+		} 
+		finally 
+		{
+			if(br != null) 
+			{
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		return machines;

@@ -9,9 +9,11 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import twitter4j.GeoLocation;
 import edu.umd.cs.dmonner.tweater.QueryBuilder;
 import edu.umd.cs.dmonner.tweater.QueryFollow;
 import edu.umd.cs.dmonner.tweater.QueryItemTime;
+import edu.umd.cs.dmonner.tweater.QueryLocation;
 import edu.umd.cs.dmonner.tweater.QueryPhrase;
 import edu.umd.cs.dmonner.tweater.QueryTrack;
 import edu.umd.cs.dmonner.tweater.util.NumberSet;
@@ -79,7 +81,7 @@ public class MySQLQueryBuilder extends QueryBuilder
 		log.fine("Beginning MySQLQueryBuilder update...");
 		final List<QueryItemTime> all = new LinkedList<QueryItemTime>();
 		boolean querySucceeded = false;
-
+		
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -132,16 +134,48 @@ public class MySQLQueryBuilder extends QueryBuilder
 			while(rs.next())
 			{
 				all.add(new QueryItemTime(new QueryFollow(rs.getInt("query_group_no"), rs
-						.getInt("query_follow_no"), rs.getInt("query_user_id")),
+						.getInt("query_follow_no"), rs.getLong("query_user_id")),
 						rs.getLong("query_start_time"), rs.getLong("query_end_time")));
 			}
 
+			// get the location queries
+			rs = stmt
+					.executeQuery("SELECT query_group_no, query_location_no, " +
+							"query_location_longSW, query_location_latSW, query_location_longNE, query_location_latNE, " +
+							"query_start_time, query_end_time " +
+							"FROM query_group INNER JOIN query_location USING (query_group_no)" + where + ";");
+
+			while(rs.next())
+			{
+				double longSW = rs.getDouble("query_location_longSW"), 
+						latSW = rs.getDouble("query_location_latSW"), 
+						longNE = rs.getDouble("query_location_longNE"), 
+						latNE = rs.getDouble("query_location_latNE");
+				GeoLocation pointSW = new GeoLocation(latSW, longSW);
+				GeoLocation pointNE = new GeoLocation(latNE, longNE);
+				QueryLocation ql = null;
+				
+				try 
+				{
+					ql = new QueryLocation(rs.getInt("query_group_no"), rs
+							.getInt("query_location_no"), pointSW, pointNE);
+				}
+				catch(IllegalArgumentException ex)
+				{
+					log.warning("Unable to construct location query #" + rs
+							.getInt("query_location_no") + ": " + ex.getMessage());
+				}
+				if(ql != null)
+				{
+					all.add(new QueryItemTime(ql, rs.getLong("query_start_time"), rs.getLong("query_end_time")));
+				}
+			}
+			
 			querySucceeded = true;
 		}
 		catch(final SQLException ex)
 		{
-			log.severe( //
-			"SQLState: " + ex.getSQLState() + "\n" + //
+			log.severe("SQLState: " + ex.getSQLState() + "\n" + //
 					"VendorError: " + ex.getErrorCode() + "\n" + //
 					Util.traceMessage(ex));
 		}

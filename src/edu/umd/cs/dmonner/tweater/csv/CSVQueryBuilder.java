@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import twitter4j.GeoLocation;
+
 import com.mdimension.jchronic.Chronic;
 
 import edu.umd.cs.dmonner.tweater.QueryBuilder;
 import edu.umd.cs.dmonner.tweater.QueryFollow;
 import edu.umd.cs.dmonner.tweater.QueryItem;
 import edu.umd.cs.dmonner.tweater.QueryItemTime;
+import edu.umd.cs.dmonner.tweater.QueryLocation;
 import edu.umd.cs.dmonner.tweater.QueryPhrase;
 import edu.umd.cs.dmonner.tweater.QueryTrack;
 import edu.umd.cs.dmonner.tweater.util.Properties;
@@ -101,12 +104,40 @@ public class CSVQueryBuilder extends QueryBuilder
 				{
 					try
 					{
-						qitem = new QueryFollow(lineno, lineno, Integer.parseInt(item));
+						qitem = new QueryFollow(lineno, lineno, Long.parseLong(item));
 					}
 					catch(final NumberFormatException ex)
 					{
 						log.warning("Malformed input! Expected a user id number (not \"" + item
 								+ "\") on line number " + lineno);
+					}
+				}
+				else if(type.equalsIgnoreCase("location"))
+				{
+					try
+					{
+						String[] coords = item.split(";");
+						double longSW = Float.parseFloat(coords[0]), 
+								latSW = Float.parseFloat(coords[1]), 
+								longNE = Float.parseFloat(coords[2]), 
+								latNE = Float.parseFloat(coords[3]);
+						GeoLocation pointSW = new GeoLocation(latSW, longSW);
+						GeoLocation pointNE = new GeoLocation(latNE, longNE);
+						qitem = new QueryLocation(lineno, lineno, pointSW, pointNE);
+					}
+					catch(final NumberFormatException ex)
+					{
+						log.warning("Malformed input! Expected four semicolon-delimeted coordinates (not \"" + item
+								+ "\") on line number " + lineno);
+					}
+					catch(final ArrayIndexOutOfBoundsException ex)
+					{
+						log.warning("Malformed input! Expected four semicolon-delimeted coordinates (not \"" + item
+								+ "\") on line number " + lineno);
+					}
+					catch(final IllegalArgumentException ex)
+					{
+						log.warning("Illegal input! " + ex.getMessage() + " on line number " + lineno);
 					}
 				}
 				else

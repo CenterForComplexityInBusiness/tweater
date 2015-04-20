@@ -5,9 +5,10 @@ from time import mktime
 import codecs
 import sys
 
-if len(sys.argv) < 2:
-	print "USAGE: query-mysql <query-file.csv> > query.sql"
-	
+if len(sys.argv) < 3:
+	print "USAGE: query-mysql <query-file(s).csv> <output file>"
+	exit()
+
 fout = codecs.open(sys.argv[-1], mode='w', encoding="utf-8")
 
 fout.write(u'SET NAMES utf8;\n');
@@ -31,15 +32,17 @@ for file in sys.argv[1:-1]:
 					ins_query = u"INSERT INTO query_track(query_group_no,query_track_string) VALUES (LAST_INSERT_ID(),'%s');" % query
 				elif type == "user":
 					ins_query = u"INSERT INTO query_follow(query_group_no,query_user_id) VALUES (LAST_INSERT_ID(),%s);" % query
+				elif type == "location":
+					ins_query = u"INSERT INTO query_location(query_group_no,query_location_longSW,query_location_latSW,query_location_longNE,query_location_latNE) VALUES (LAST_INSERT_ID(),%s);" % ",".join(query.split(";"))
 				else:
 					sys.stderr.write("Unknown query type %s on line %i; skipping.\n" % (type, lno))
 					doInsert = False
-					
+
 				if do_insert:
 					fout.write(u"INSERT INTO query_group(query_start_time,query_end_time) VALUES (%i,%i);\n" % (start, end))
 					fout.write(ins_query + u'\n')
 			else:
 				sys.stderr.write("Malformed line %i has %i fields; skipping.\n" % (lno, len(fields)))
 		lno += 1
-	
+
 	fin.close()
